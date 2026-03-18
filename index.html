@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cyber Terminal</title>
+
+<style>
+body {
+  margin: 0;
+  background: #000;
+  font-family: monospace;
+  color: #0f0;
+  overflow: hidden;
+}
+
+/* MATRIX */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+/* TERMINAL */
+.terminal {
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 20px;
+  border: 1px solid #0f0;
+  background: rgba(0,0,0,0.9);
+  box-shadow: 0 0 25px #0f0;
+}
+
+/* OUTPUT */
+#output {
+  height: 300px;
+  overflow-y: auto;
+}
+
+/* POPUP (FIXED + VISIBLE) */
+.popup {
+  position: fixed;
+  background: black;
+  border: 3px solid red;
+  color: red;
+  padding: 15px 25px;
+  font-size: 18px;
+  box-shadow: 0 0 30px red;
+  z-index: 9999;
+  animation: glitch 0.4s infinite;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(3px,-3px); }
+  50% { transform: translate(-3px,3px); }
+  75% { transform: translate(3px,3px); }
+  100% { transform: translate(0,0); }
+}
+
+/* FINAL SCREEN */
+.fullscreen {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  color:red;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:50px;
+  text-shadow:0 0 20px red;
+  z-index:10000;
+}
+</style>
+</head>
+
+<body onload="startHack()">
+
+<canvas id="matrix"></canvas>
+
+<div class="terminal">
+  <div id="output"></div>
+</div>
+
+<script>
+/* MATRIX */
+const c = document.getElementById("matrix");
+const ctx = c.getContext("2d");
+c.width = window.innerWidth;
+c.height = window.innerHeight;
+
+const letters="01";
+const drops = Array(Math.floor(c.width/10)).fill(1);
+
+function draw(){
+  ctx.fillStyle="rgba(0,0,0,0.05)";
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle="#0f0";
+  ctx.font="10px monospace";
+
+  drops.forEach((y,i)=>{
+    const t=letters[Math.random()*2|0];
+    ctx.fillText(t,i*10,y*10);
+    if(y*10>c.height && Math.random()>0.975) drops[i]=0;
+    drops[i]++;
+  });
+}
+setInterval(draw,33);
+
+/* TERMINAL */
+const out=document.getElementById("output");
+
+function log(t){
+  const d=document.createElement("div");
+  d.textContent=">> "+t;
+  out.appendChild(d);
+  out.scrollTop=out.scrollHeight;
+}
+
+/* STEPS */
+const steps = [
+  "Initializing connection...",
+  "Bypassing firewall...",
+  "Injecting payload...",
+  "Decrypting data...",
+  "System override...",
+  "Injecting malware..."
+];
+
+async function startHack(){
+  for(let s of steps){
+    log(s);
+    await new Promise(r=>setTimeout(r,500));
+  }
+
+  startPopups();
+}
+
+/* FIXED POPUPS */
+function createPopup(){
+  const p = document.createElement("div");
+  p.className="popup";
+  p.textContent="⚠ SYSTEM INFECTED ⚠";
+
+  // center-ish spawn
+  p.style.left = (Math.random()*60 + 20) + "%";
+  p.style.top = (Math.random()*60 + 20) + "%";
+
+  document.body.appendChild(p);
+
+  setTimeout(()=>p.remove(),4000);
+}
+
+/* CHAOS MODE */
+function startPopups(){
+  log("Malware deployed...");
+
+  let count = 0;
+
+  const interval = setInterval(()=>{
+    // spawn multiple
+    createPopup();
+    createPopup();
+    createPopup();
+
+    count++;
+
+    if(count > 15){
+      clearInterval(interval);
+      takeover();
+    }
+  },300);
+}
+
+/* FINAL TAKEOVER */
+function takeover(){
+  const div = document.createElement("div");
+  div.className = "fullscreen";
+  div.textContent = "SYSTEM OVERRIDDEN";
+  document.body.appendChild(div);
+}
+</script>
+
+</body>
+</html>
