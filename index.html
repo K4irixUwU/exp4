@@ -2,68 +2,97 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cyber Terminal</title>
+<title>Cyber Chaos</title>
 
 <style>
 body {
-  margin: 0;
-  background: #000;
-  font-family: monospace;
-  color: #0f0;
-  overflow: hidden;
+  margin:0;
+  background:black;
+  color:#0f0;
+  font-family:monospace;
+  overflow:hidden;
 }
 
 /* MATRIX */
 canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 0;
+  position:fixed;
+  z-index:0;
 }
 
 /* TERMINAL */
 .terminal {
-  position: relative;
-  z-index: 2;
-  width: 90%;
-  max-width: 800px;
-  margin: 60px auto;
-  padding: 20px;
-  border: 1px solid #0f0;
-  background: rgba(0,0,0,0.9);
-  box-shadow: 0 0 25px #0f0;
+  position:relative;
+  z-index:2;
+  width:90%;
+  max-width:800px;
+  margin:60px auto;
+  padding:20px;
+  border:1px solid #0f0;
+  background:rgba(0,0,0,.9);
+  box-shadow:0 0 25px #0f0;
 }
 
 /* OUTPUT */
 #output {
-  height: 300px;
-  overflow-y: auto;
+  height:260px;
+  overflow:auto;
 }
 
-/* POPUP (FIXED + VISIBLE) */
+/* POPUPS */
 .popup {
-  position: fixed;
-  background: black;
-  border: 3px solid red;
-  color: red;
-  padding: 15px 25px;
-  font-size: 18px;
-  box-shadow: 0 0 30px red;
-  z-index: 9999;
-  animation: glitch 0.4s infinite;
+  position:fixed;
+  border:3px solid red;
+  color:red;
+  background:black;
+  padding:15px;
+  font-size:18px;
+  z-index:9999;
+  box-shadow:0 0 30px red;
+  animation:glitch .3s infinite;
 }
 
 @keyframes glitch {
-  0% { transform: translate(0,0); }
-  25% { transform: translate(3px,-3px); }
-  50% { transform: translate(-3px,3px); }
-  75% { transform: translate(3px,3px); }
-  100% { transform: translate(0,0); }
+  0%{transform:translate(0)}
+  25%{transform:translate(3px,-3px)}
+  50%{transform:translate(-3px,3px)}
+  75%{transform:translate(3px,3px)}
+  100%{transform:translate(0)}
+}
+
+/* SCREEN SHAKE */
+.shake {
+  animation:shake .2s infinite;
+}
+
+@keyframes shake {
+  0%{transform:translate(0,0)}
+  25%{transform:translate(5px,-5px)}
+  50%{transform:translate(-5px,5px)}
+  75%{transform:translate(5px,5px)}
+  100%{transform:translate(0,0)}
+}
+
+/* RED FLASH */
+.flash {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:red;
+  opacity:0.15;
+  z-index:9998;
+  animation:flash 0.3s infinite;
+}
+
+@keyframes flash {
+  0%,100%{opacity:0.1}
+  50%{opacity:0.4}
 }
 
 /* FINAL SCREEN */
-.fullscreen {
-  position: fixed;
+.final {
+  position:fixed;
   top:0;
   left:0;
   width:100%;
@@ -74,8 +103,9 @@ canvas {
   align-items:center;
   justify-content:center;
   font-size:50px;
-  text-shadow:0 0 20px red;
+  text-align:center;
   z-index:10000;
+  text-shadow:0 0 25px red;
 }
 </style>
 </head>
@@ -90,13 +120,13 @@ canvas {
 
 <script>
 /* MATRIX */
-const c = document.getElementById("matrix");
-const ctx = c.getContext("2d");
-c.width = window.innerWidth;
-c.height = window.innerHeight;
+const c=document.getElementById("matrix");
+const ctx=c.getContext("2d");
+c.width=window.innerWidth;
+c.height=window.innerHeight;
 
 const letters="01";
-const drops = Array(Math.floor(c.width/10)).fill(1);
+const drops=Array(Math.floor(c.width/10)).fill(1);
 
 function draw(){
   ctx.fillStyle="rgba(0,0,0,0.05)";
@@ -124,7 +154,7 @@ function log(t){
 }
 
 /* STEPS */
-const steps = [
+const steps=[
   "Initializing connection...",
   "Bypassing firewall...",
   "Injecting payload...",
@@ -136,54 +166,81 @@ const steps = [
 async function startHack(){
   for(let s of steps){
     log(s);
-    await new Promise(r=>setTimeout(r,500));
+    await new Promise(r=>setTimeout(r,400));
   }
-
-  startPopups();
+  chaos();
 }
 
-/* FIXED POPUPS */
-function createPopup(){
-  const p = document.createElement("div");
+/* POPUPS */
+function popup(){
+  const p=document.createElement("div");
   p.className="popup";
   p.textContent="⚠ SYSTEM INFECTED ⚠";
 
-  // center-ish spawn
-  p.style.left = (Math.random()*60 + 20) + "%";
-  p.style.top = (Math.random()*60 + 20) + "%";
+  p.style.left=(Math.random()*60+20)+"%";
+  p.style.top=(Math.random()*60+20)+"%";
 
   document.body.appendChild(p);
-
-  setTimeout(()=>p.remove(),4000);
+  setTimeout(()=>p.remove(),3000);
 }
 
 /* CHAOS MODE */
-function startPopups(){
-  log("Malware deployed...");
+function chaos(){
+  log("MALWARE ACTIVE...");
+  
+  // shake screen
+  document.body.classList.add("shake");
 
-  let count = 0;
+  // red flash
+  const flash=document.createElement("div");
+  flash.className="flash";
+  document.body.appendChild(flash);
 
-  const interval = setInterval(()=>{
-    // spawn multiple
-    createPopup();
-    createPopup();
-    createPopup();
-
+  // popups spam
+  let count=0;
+  const spam=setInterval(()=>{
+    popup(); popup(); popup();
     count++;
 
-    if(count > 15){
-      clearInterval(interval);
-      takeover();
+    if(count>15){
+      clearInterval(spam);
+      fakeDelete();
     }
-  },300);
+  },200);
 }
 
-/* FINAL TAKEOVER */
-function takeover(){
-  const div = document.createElement("div");
-  div.className = "fullscreen";
-  div.textContent = "SYSTEM OVERRIDDEN";
-  document.body.appendChild(div);
+/* FAKE FILE DELETE */
+function fakeDelete(){
+  log("Deleting system files...");
+
+  let files=[
+    "system32.dll",
+    "user_data.db",
+    "security.log",
+    "kernel.sys",
+    "boot.ini"
+  ];
+
+  let i=0;
+  const del=setInterval(()=>{
+    if(i<files.length){
+      log("Deleting "+files[i]+" ...");
+      i++;
+    } else {
+      clearInterval(del);
+      finalScreen();
+    }
+  },400);
+}
+
+/* FINAL PRANK */
+function finalScreen(){
+  document.body.innerHTML=`
+    <div class="final">
+      YOU HAVE BEEN HACKED 💀<br><br>
+      (just kidding 😈)
+    </div>
+  `;
 }
 </script>
 
